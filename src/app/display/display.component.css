@@ -1,0 +1,68 @@
+/**reset**/
+table, tr, td, pre{
+  margin: 0;
+  padding: 0;
+}
+#table{
+  height: 52.934vw;
+  border: 1px solid black;
+  float: left;
+  table-layout: fixed;
+  overflow: auto;
+}
+#table table tr, pre{
+  width: 30vw;
+  word-wrap: break-word;
+}
+table tr.active td{
+  background-color:darkgray !important;
+}
+.display{
+  float: right;
+  display: table;
+  position: relative;
+  height: 28.125vw;
+  width: 45vw;
+  margin-right: 1vw;
+  background: #000000;
+  font-size: 3.9156vw;
+  line-height: 3.636vw;
+  text-align: center;
+  font-family: Times;
+  font-weight: 100;
+}
+.middle {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.inner {
+  margin: 0 auto;
+  padding: 10px;
+  width: 45vw; /*whatever width you want*/
+  word-wrap: break-word;
+  color: #FFF;
+}
+:host ::ng-deep pre{
+  line-height: 1.958vw;
+}
+:host ::ng-deep .inner sub{
+  font-size: 55%;
+  line-height: 1.958vw;
+  display: block;
+}
+:host ::ng-deep .inner p{
+  line-height: 3.356vw;
+  margin: 0;
+}
+:host ::ng-deep .newLine{
+  display: block;
+  height: 3.9156vw;
+}
+.footer {
+  font-size: 1.958vw;
+  position: absolute;
+  bottom: 0;
+  left: 5px;
+  color: #FFF;
+}

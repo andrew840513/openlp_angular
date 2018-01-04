@@ -1,39 +1,14 @@
-aside {
-    position: fixed;
-    width: 180px;
-    height: 100%;
-    bottom:0;
-    overflow-y: auto;
-    background-color: #eee;
+.song{
+  margin: 20px;
 }
-input#search-input.form-control.ds-input{
-  position: fixed;
-  width: 180px;
-}
-aside table{
-  margin-top: 40px;
+textarea{
+  width: 80vh;
+  height: 80vh;
 }
 
-td{
-    padding: 0;
-    width: 180px;
-}
-td:hover{
-  background: lightgray;
-}
-
-table tr.active td{
-  background-color:darkgray !important;
-}
-/*table a{*/
-  /*color: #000;*/
-  /*display: block;*/
-/*}*/
-/*table a:hover, table a{*/
-  /*text-decoration: none;*/
-/*}*/
-main {
-   margin-left: 200px;
+.break:last-child{
+  visibility:hidden;
+  display:none;
 }
 
 /** right click menu**/
@@ -76,3 +51,4 @@ li{
   background: #eee;
   border-left: 4px solid #666;
 }
+
