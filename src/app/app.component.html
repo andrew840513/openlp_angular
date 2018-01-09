@@ -1,10 +1,10 @@
 <section (click)="hideContextMenu()" (keydown)="listenKeys($event)">
     <aside>
-      <input (keyup)="search($event)" [(ngModel)]="searchText" type="search" class="form-control ds-input" id="search-input" placeholder="Search..." autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-owns="algolia-autocomplete-listbox-0">
-        <table class="table">
+      <input (keyup)="search()" [(ngModel)]="searchText" type="search" class="form-control ds-input" id="search-input" placeholder="Search..." autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-owns="algolia-autocomplete-listbox-0">
+        <table id="searchTable" class="table">
             <tbody>
-            <tr *ngFor="let d of data; let i = index" [class.active]="i == selectedRow">
-              <td scope="row" id="{{d.id}}" (dblclick)="redirectToPreview(d.id)"  (contextmenu)="showSongActionMenu($event)" (click)="titleOnClick(i)">{{d.title}}</td>
+            <tr #row *ngFor="let d of data; let i = index" [class.active]="i == selectedRow">
+              <td scope="row" id="{{d.id}}" (dblclick)="redirectToPreview(d.id)"  (contextmenu)="showSongActionMenu($event,d.id)" (click)="titleOnClick(i)">{{d.title}}</td>
             </tr>
             </tbody>
         </table>
@@ -18,7 +18,7 @@
     <ul>
       <li routerLink="display/{{rightClickID}}" routerLinkActive="true">Preview</li>
       <li routerLink="song/{{rightClickID}}" routerLinkActive="true">Edit</li>
-      <li>Delete</li>
+      <li (click)="deleteSong()">Delete</li>
     </ul>
   </div>
 </section>

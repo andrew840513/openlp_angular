@@ -1,10 +1,13 @@
 <ng-container (click)="hideContextMenu()" (keydown)="listenKeys($event)" *ngIf="xml">
   <label for="title">Title:</label>
-  <input type="text" id="title" value="{{xml.title}}"> <br>
+  <input type="text" id="title" [(ngModel)]="xml.title"> <br>
   <textarea (contextmenu)="showContextMenu($event)" #myTextArea class="song" id="song" [(ngModel)]="xml.text"></textarea><br>
   <button (click)="insertAtCursor(myTextArea)">Insert Slide</button>
   <button>Cancel</button>
-  <button (click)="updateSong()">Save</button>
+  <!--Update-->
+  <button *ngIf="currentID" (click)="updateSong()">Save</button>
+  <!--Create-->
+  <button *ngIf="!currentID" (click)="createSong()">Save</button>
   <div id="contextMenu" class="context-menu">
     <ul>
       <li>Function

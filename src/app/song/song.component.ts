@@ -1,71 +1,95 @@
 import {Component, OnInit} from '@angular/core';
 import {AjaxService} from "../ajax.service";
-import {ActivatedRoute, Params}       from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import * as x2js from "xml-js";
 import * as PinyinHelper from "../pinyin/PinyinHelper";
+import {isUndefined} from "util";
 
 @Component({
   selector: 'app-song',
   templateUrl: './song.component.html',
   styleUrls: ['./song.component.css']
 })
-export class SongComponent implements OnInit{
-  _ajaxService:AjaxService;
+export class SongComponent implements OnInit {
+  _ajaxService: AjaxService;
   currentID;
-  xml: string[];
+  xml;
   convert = x2js;
 
   pinyinHelper = PinyinHelper.PinyinHelper;
   pinyinFormat = PinyinHelper.PinyinFormat;
 
-  constructor(ajaxService: AjaxService,private route: ActivatedRoute) {
+  constructor(ajaxService: AjaxService, private route: ActivatedRoute, private router:Router) {
     this._ajaxService = ajaxService;
-    this.route.params.forEach((params: Params) => {
-      this.currentID = params['id'];
-    });
-    this.getSong();
   }
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
-      this.currentID = params['id'];
-      this.getSong();
-    });
+    if (!this.getSong()) {
+      this.newSong();
+    }
+  }
+
+  newSong() {
+    this.xml = {
+      title: '',
+      text: ''
+    }
+
   }
 
   getSong() {
-    let url = 'http://localhost:8080/server.php/title,text/custom_slide/id/' + this.currentID;
-    this._ajaxService.getData(url).subscribe(
-      data => {
-        this.xml = data;
-        let result = this.convert.xml2json(data['text'], {compact: true});
-        result = JSON.parse(result);
-        let combineText = "";
-        let index = 0;
-        for (let verse of result["song"]["lyrics"]["verse"]) {
-          combineText += verse._cdata + "\n";
-          if (result["song"]["lyrics"]["verse"][index + 1]) {
-            combineText += "[===]\n";
+    let isGet = false;
+    this.route.params.subscribe(params => {
+      this.currentID = params['id'];
+      if (this.currentID) {
+        let url = 'public/server.php/title,text/custom_slide/id/' + this.currentID;
+        this._ajaxService.getData(url).subscribe(
+          data => {
+            if (isUndefined(data['error'])) {
+              this.xml = data;
+              let result = this.convert.xml2json(data['text'], {compact: true});
+              result = JSON.parse(result);
+              if(result["song"]["lyrics"]["verse"] instanceof Array) {
+                let combineText = "";
+                let index = 0;
+                for (let verse of result["song"]["lyrics"]["verse"]) {
+                  if (verse._cdata == undefined) {
+                    verse._cdata = '';
+                  }
+                  combineText += verse._cdata + "\n";
+                  if (result["song"]["lyrics"]["verse"][index + 1]) {
+                    combineText += "[===]\n";
+                  }
+
+                  index++
+                }
+                this.xml["text"] = combineText.trim();
+              }else{
+                this.xml["text"] = result["song"]["lyrics"]["verse"]._cdata;
+              }
+            }
+          },
+          error => {
+            console.log(error);
+          },
+          () => {
           }
-          index++
-        }
-        this.xml["text"] = combineText.trim();
-      },
-      error => {
-        console.log(error);
-      },
-      () => {
+        );
+        isGet = true;
       }
-    );
+    });
+    return isGet;
   }
 
   updateSong() {
-    let url = 'http://localhost:8080/server.php/custom_slide/' + this.currentID;
+    let url = 'public/server.php/custom_slide/' + this.currentID;
     let payload = {
+      title: this.xml.title,
       text: this.compileSong()
     };
     this._ajaxService.putData(url, payload).subscribe(
       data => {
+        this.router.navigateByUrl('/display/'+this.currentID);
       },
       error => {
         console.log(error)
@@ -75,7 +99,30 @@ export class SongComponent implements OnInit{
     )
   }
 
-  compileSong(): string {
+  createSong() {
+    let url = 'public/server.php/custom_slide';
+    let payload = {
+      title: this.xml.title,
+      text: this.compileSong(),
+      credits: "",
+      theme_name: "Black"
+    };
+
+    this._ajaxService.postData(url, payload).subscribe(
+      data => {
+        let id = data['success']['id'];
+        console.log(id);
+        this.router.navigateByUrl('/display/'+id);
+      },
+      error => {
+        console.log(error)
+      },
+      () => {
+      }
+    );
+  }
+
+  compileSong1() {
     let text = this.xml['text'].split("\n");
     let concat = "";
     let index = 1;
@@ -99,10 +146,64 @@ export class SongComponent implements OnInit{
       }
     };
 
+    let hasFirstLine = false;
     for (let split of text) {
-      if (split != '[===]') {
+      if (!hasFirstLine) {
+        concat += split + '\n';
+        hasFirstLine = true;
+      } else if (split != '[===]') {
         concat += split + '\n';
       } else {
+        if (concat != "") {
+          let verseArrayTemplate = {
+            "_attributes": {
+              "label": "",
+              "type": "custom"
+            },
+            "_cdata": ""
+          };
+
+          verseArrayTemplate._attributes.label = index.toString();
+          verseArrayTemplate._cdata = concat.replace(/\n$/, "").toString();
+          template.song.lyrics.verse.push(verseArrayTemplate);
+        }
+        concat = "";
+        index++;
+      }
+    }
+  }
+
+  compileSong(): string {
+    let text = this.xml['text'].split("\n");
+    let concat = "";
+    let index = 1;
+    let count = 1;
+    let hasContent: boolean = false;
+    let template = {
+      "_declaration": {
+        "_attributes": {
+          "version": "1.0",
+          "encoding": "utf-8"
+        }
+      },
+      "song": {
+        "_attributes": {
+          "version": "1.0"
+        },
+        "lyrics": {
+          "_attributes": {
+            "language": "en"
+          },
+          "verse": []
+        }
+      }
+    };
+
+    for (let split of text) {
+      if (split == '[===]' && hasContent) {
+        if(count == text.length){
+          concat += split + '\n';
+        }
         let verseArrayTemplate = {
           "_attributes": {
             "label": "",
@@ -112,52 +213,57 @@ export class SongComponent implements OnInit{
         };
 
         verseArrayTemplate._attributes.label = index.toString();
-        verseArrayTemplate._cdata = concat.replace(/\n$/, "");
+        verseArrayTemplate._cdata = concat.replace(/\n$/, "").toString();
         template.song.lyrics.verse.push(verseArrayTemplate);
         concat = "";
         index++;
+        hasContent = false;
+      } else {
+        concat += split + '\n';
+        hasContent = true;
       }
+      count++;
     }
+    if(concat != "") {
+      let verseArrayTemplate = {
+        "_attributes": {
+          "label": "",
+          "type": "custom"
+        },
+        "_cdata": ""
+      };
 
-    let verseArrayTemplate = {
-      "_attributes": {
-        "label": "",
-        "type": "custom"
-      },
-      "_cdata": ""
-    };
-
-    verseArrayTemplate._attributes.label = index.toString();
-    verseArrayTemplate._cdata = concat.replace(/\n$/, "");
-    template.song.lyrics.verse.push(verseArrayTemplate);
-
+      verseArrayTemplate._attributes.label = index.toString();
+      verseArrayTemplate._cdata = concat.replace(/\n$/, "").toString();
+      template.song.lyrics.verse.push(verseArrayTemplate);
+    }
     return this.convert.json2xml(JSON.stringify(template), {compact: true});
   }
 
   addPinYin(textComponent) {
     if (textComponent.selectionStart !== undefined) {// Standards Compliant Version
       let selected = SongComponent.getSelectedText(textComponent);
-      if(selected.trim() != ''){
+      if (selected.trim() != '') {
         textComponent.focus();
-        let text = selected+'\n{su}' + this.pinyinHelper.convertToPinyinString(selected, ' ', this.pinyinFormat.WITHOUT_TONE)+'{/su}';
+        let text = selected + '\n{su}' + this.pinyinHelper.convertToPinyinString(selected, ' ', this.pinyinFormat.WITHOUT_TONE) + '{/su}';
         document.execCommand("insertText", false, text);
       }
     }
   }
 
-  addTag(textComponent, text){
-    let startTag = '{'+text+'}';
-    let endTag = '{/'+text+'}';
+  addTag(textComponent, text) {
+    let startTag = '{' + text + '}';
+    let endTag = '{/' + text + '}';
     if (textComponent.selectionStart !== undefined) {// Standards Compliant Version
       let selected = SongComponent.getSelectedText(textComponent);
-      if(selected.trim() != ''){
+      if (selected.trim() != '') {
         textComponent.focus();
-        document.execCommand("insertText", false, startTag+ selected.trim() + endTag);
+        document.execCommand("insertText", false, startTag + selected.trim() + endTag);
       }
     }
   }
 
-  insertAtCursor(textComponent){
+  insertAtCursor(textComponent) {
     textComponent.focus();
     document.execCommand("insertText", false, '[===]');
   }
@@ -176,32 +282,31 @@ export class SongComponent implements OnInit{
   showContextMenu(event) {
     let contextMenu = document.getElementById('contextMenu');
     contextMenu.style.display = 'block';
-    contextMenu.style.left = event.clientX+5 + 'px';
-    contextMenu.style.top = event.clientY+5 + 'px';
+    contextMenu.style.left = event.clientX + 5 + 'px';
+    contextMenu.style.top = event.clientY + 5 + 'px';
     return false;
   }
 
   hideContextMenu() {
     let contextMenu = document.getElementById('contextMenu');
     let songActionMenu = document.getElementById('songActionMenu');
-    if(contextMenu){
+    if (contextMenu) {
       contextMenu.style.display = 'none';
     }
-    if(songActionMenu){
+    if (songActionMenu) {
       songActionMenu.style.display = 'none';
     }
   }
 
   listenKeys(event) {
     let keyCode = event.which || event.keyCode;
-    console.log(keyCode == 27);
-    if(keyCode == 27){
+    if (keyCode == 27) {
       let contextMenu = document.getElementById('contextMenu');
       let songActionMenu = document.getElementById('songActionMenu');
-      if(contextMenu){
+      if (contextMenu) {
         contextMenu.style.display = 'none';
       }
-      if(songActionMenu){
+      if (songActionMenu) {
         songActionMenu.style.display = 'none';
       }
     }

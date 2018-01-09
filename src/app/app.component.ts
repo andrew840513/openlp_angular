@@ -2,7 +2,6 @@ import {Component} from '@angular/core';
 import {AjaxService} from "./ajax.service";
 import {Router} from "@angular/router";
 
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -15,13 +14,14 @@ export class AppComponent {
   searchText='';
   //import
   _ajaxService: AjaxService;
+  rightClickID;
   constructor(ajaxService: AjaxService, private router:Router) {
     this._ajaxService = ajaxService;
     this.getTitle();
   }
 
   getTitle() {
-    this._ajaxService.getData("http://localhost:8080/server.php/id,title/custom_slide?by=title").subscribe(
+    this._ajaxService.getData("public/server.php/id,title/custom_slide?by=title").subscribe(
       data => {
         this.data = data;
       },
@@ -33,6 +33,19 @@ export class AppComponent {
     );
   }
 
+  deleteSong(){
+    let url = 'public/server.php/custom_slide/'+this.rightClickID;
+    this._ajaxService.deleteData(url).subscribe(
+      data =>{
+        this.getTitle();
+      },
+      error=>{
+        console.log(error)
+      },()=>{
+      }
+    )
+  }
+
   //setIndex
   titleOnClick(index) {
     this.selectedRow = index;
@@ -40,28 +53,29 @@ export class AppComponent {
 
 
   //search
-  search(event){
-    let keyCode = event.which || event.keyCode;
-    if(keyCode == 13){
-      this._ajaxService.getData("http://localhost:8080/server.php/id,title/custom_slide/title?like="+this.searchText+"&by=title").subscribe(
-        data => {
-          this.data = data;
-        },
-        error => {
-          console.log(error);
-        },
-        () => {
+  search(){
+    let table = document.getElementById('searchTable');
+    let tr = table.getElementsByTagName('tr');
+    let filter = this.searchText.toUpperCase();
+    for(let i =0; i< tr.length; i++){
+      let td = tr[i].getElementsByTagName('td')[0];
+      if(td){
+        if(td.innerHTML.toUpperCase().indexOf(filter) > -1){
+          tr[i].style.display = "";
+        }else{
+          tr[i].style.display = "none";
         }
-      );
+      }
     }
   }
   //menu cancel
   //menu
-  showSongActionMenu(event) {
+  showSongActionMenu(event,id) {
     let contextMenu = document.getElementById('songActionMenu');
     contextMenu.style.display = 'block';
     contextMenu.style.left = event.clientX+5 + 'px';
     contextMenu.style.top = event.clientY+5 + 'px';
+    this.rightClickID = id;
     return false;
   }
 
@@ -69,21 +83,16 @@ export class AppComponent {
     let contextMenu = document.getElementById('contextMenu');
     let songActionMenu = document.getElementById('songActionMenu');
     if(contextMenu){
-      console.log('find contextMenu');
       contextMenu.style.display = 'none';
     }
     if(songActionMenu){
-      console.log('find songActionMenu');
       songActionMenu.style.display = 'none';
     }
-    console.log('didnt find');
   }
 
   listenKeys(event) {
     let keyCode = event.which || event.keyCode;
-    console.log(keyCode == 27);
     if(keyCode == 27){
-      console.log('called function');
       this.hideContextMenu();
     }
   }

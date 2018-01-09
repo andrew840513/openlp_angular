@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {MatTableDataSource} from '@angular/material';
 import {AjaxService} from "../ajax.service";
 import * as x2js from "xml-js";
 import {ActivatedRoute} from "@angular/router";
@@ -36,18 +35,26 @@ export class DisplayComponent implements OnInit {
     return DisplayComponent.position;
   }
   getSong() {
-    let url = 'http://localhost:8080/server.php/title,text/custom_slide/id/' + this.currentID;
+    let url = 'public/server.php/title,text/custom_slide/id/' + this.currentID;
     this._ajaxService.getData(url).subscribe(
       data => {
         this.title=data['title'];
         let result = this.convert.xml2json(data['text'], {compact: true});
-        result = JSON.parse(result);
         let songArray=[];
-        for (let verse of result["song"]["lyrics"]["verse"]) {
-          songArray = songArray.concat(this.seprateNewLine(verse._cdata));
+        result = JSON.parse(result);
+        if(result["song"]["lyrics"]["verse"] instanceof Array){
+          for (let verse of result["song"]["lyrics"]["verse"]) {
+            if(verse._cdata == undefined){
+              verse._cdata = '';
+            }
+            songArray = songArray.concat(this.seprateNewLine(verse._cdata));
+          }
+          this.xml = result["song"]["lyrics"]["verse"];
+        }else{
+          songArray = songArray.concat(this.seprateNewLine(result["song"]["lyrics"]["verse"]._cdata,true));
+          this.xml = [{'_cdata':result["song"]["lyrics"]["verse"]._cdata}];
         }
         DisplayComponent.arr = songArray;
-        this.xml = result["song"]["lyrics"]["verse"];
       },
       error => {
         console.log(error);
@@ -59,7 +66,6 @@ export class DisplayComponent implements OnInit {
 
   keyPress(event) {
     let keyCode = event.which || event.keyCode;
-    console.log(keyCode);
     if(keyCode == 38 && DisplayComponent.position > 0){
       DisplayComponent.position--;
     }else if(keyCode == 40 &&DisplayComponent.position < DisplayComponent.arr.length-1) {
@@ -80,22 +86,42 @@ export class DisplayComponent implements OnInit {
   replaceWithTag(text,tag,htmlTag){
     let startTag = new RegExp('{'+tag+'}',"g");
     let endTag = new RegExp('{/'+tag+'}',"g");
-    let newText = text.trim().replace(startTag,'<'+htmlTag+'>')
-      .replace(endTag,'</'+htmlTag+'>');
-    return newText;
+    if(text != '') {
+      let newText = text.replace(startTag, '<' + htmlTag + '>')
+        .replace(endTag, '</' + htmlTag + '>');
+      return newText;
+    }else{
+      return '';
+    }
   }
   removeTag(text){
-    let regex = new RegExp('{su}|{st}|{/su}|{/st}',"g");
-    let newText = text.replace(regex,'');
-    return newText;
+    if(text) {
+      let regex = new RegExp('{su}|{st}|{/su}|{/st}', "g");
+      let newText = text.replace(regex, '');
+      return newText;
+    }else{
+      return '';
+    }
   }
 
-  seprateNewLine(text){
+  seprateNewLine(text, onlyOneLine = false){
     let pTag = '<p>';
-    let newText = pTag.concat(text.trim().replace(/\n/g,'</p><p>'));
+    text = this.replaceWithTag(text,'su','sub');
+    text = this.replaceWithTag(text,'st','strong');
+    let subString = text.match(/<sub>[\s\S]*?<\/sub>/g);
+    text = text.replace(/<sub>[\s\S]*?<\/sub>/g,'~');
+    if(subString){
+      for(let i = 0; i < subString.length ; i++){
+        text = text.replace('~',subString[i].replace('\n','<br>'));
+      }
+    }
+
+
+    let newText = pTag.concat(text.replace(/\n/g,'</p><p>'));
     newText = newText.replace('<p></p>','<span class="newLine"></span>');
-    newText = this.replaceWithTag(newText,'su','sub');
-    newText = this.replaceWithTag(newText,'st','strong');
+    if(onlyOneLine){
+      newText = newText.concat('</p>');
+    }
     return newText;
   }
 
@@ -113,5 +139,4 @@ export class DisplayComponent implements OnInit {
       songActionMenu.style.display = 'none';
     }
   }
-
 }

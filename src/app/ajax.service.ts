@@ -23,6 +23,18 @@ export class AjaxService {
         );
     }
 
+    public postData(url: string, data): Observable<any>{
+      return this.http.post<string[]>(url,data)
+        .pipe(
+          catchError(this.handleError)
+        );
+    }
+
+    public deleteData(url: string): Observable<any>{
+      return this.http.delete<string[]>(url).pipe(
+        catchError(this.handleError)
+      )
+    }
     private handleError(error: any) {
         const errMsg = (error.message) ? error.message :
             error.status ? `${error.status} - ${error.statusText}` : 'Server error';

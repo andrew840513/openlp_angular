@@ -1,6 +1,7 @@
 <div class="container" (click)="hideContextMenu()" (keydown)="keyPress($event)">
   <div id="table">
-    <table class="table table-striped">
+    <table *ngIf="xml" class="table table-striped">
+      <th>{{title}}</th>
       <tr *ngFor="let verse of xml; let i = index" [class.active]="i == getIndex()" (click)="setSelectedRow(i)">
         <td style="border: 1px solid; width: 20px">{{i+1}}</td>
         <td style="border: 1px solid"><pre>{{removeTag(verse._cdata)}}</pre></td>
