@@ -1,4 +1,4 @@
-<section (click)="hideContextMenu()" (keydown)="listenKeys($event)">
+<section class="app" (click)="hideContextMenu()" (keydown)="listenKeys($event)">
     <aside>
       <input (keyup)="search()" [(ngModel)]="searchText" type="search" class="form-control ds-input" id="search-input" placeholder="Search..." autocomplete="off" spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-owns="algolia-autocomplete-listbox-0">
         <table id="searchTable" class="table">
@@ -10,6 +10,7 @@
         </table>
     </aside>
     <main>
+      <button routerLink="/" routerLinkActive="true">Home</button>
       <button routerLink="song/create" routerLinkActive="true">New Song</button>
       <br>
       <router-outlet></router-outlet>

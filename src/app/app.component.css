@@ -76,3 +76,7 @@ li{
   background: #eee;
   border-left: 4px solid #666;
 }
+
+.app{
+  min-width: 800px;
+}

@@ -101,4 +101,8 @@ export class AppComponent {
   redirectToPreview(rightClickID){
     this.router.navigate(['./display/'+ rightClickID]);
   }
+
+  pin(number){
+    return number*5;
+  }
 }

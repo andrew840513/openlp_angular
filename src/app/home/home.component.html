@@ -1,1 +1,52 @@
-<div (click)="hideContextMenu()" (keydown)="listenKeys($event)"></div>
+<div class="col-xs-12 col-md-12 row" id="container" (click)="hideContextMenu()" (keydown)="listenKeys($event)">
+  <div id="edit" class="col-xs-5 col-md-5">
+    <label for="title">Title:</label>
+    <input type="text" id="title" [(ngModel)]="data.title"> <br>
+    <textarea (contextmenu)="showContextMenu($event)" #myTextArea class="song col-xs-12 col-md-12" id="song"
+              [(ngModel)]="data.edit"></textarea><br>
+    <button (click)="insertAtCursor(myTextArea)">Insert Slide</button>
+    <button>Cancel</button>
+    <!--Update-->
+    <button *ngIf="currentID" (click)="updateSong()">Save</button>
+    <!--Create-->
+    <button *ngIf="!currentID" (click)="createSong()">Save</button>
+  </div><!--end of edit-->
+
+  <div id="preview" class="col-md-7">
+    <div id="table">
+      <table *ngIf="data.preview" class="table table-striped">
+        <th>{{data.title}}</th>
+        <tr *ngFor="let verse of data.preview; let i = index" [class.active]="i == index" (click)="setIndex(i)">
+          <td style="border: 1px solid; width: 20px">{{i+1}}</td>
+          <td style="border: 1px solid">
+            <pre>{{verse}}</pre>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div id="display">
+      <div class="middle">
+        <pre *ngIf="data.display" class="inner" [innerHTML]="data.display[index]"></pre>
+        <div class="footer">{{data.title}}</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="contextMenu" class="context-menu">
+  <ul>
+    <li>Function
+      <ul>
+        <li (click)="addPinYin(myTextArea)">加拼音</li>
+        <li (click)="addTag(myTextArea,'st')">Bold</li>
+        <li (click)="addTag(myTextArea,'su')">Small Script</li>
+      </ul>
+    </li>
+    <li>Cut</li>
+    <li>Copy</li>
+    <li>Paste</li>
+    <li>Delete</li>
+    <li>Undo</li>
+    <li>Redo</li>
+    <li>Select All</li>
+  </ul>
+</div><!--end of contextMenu-->
