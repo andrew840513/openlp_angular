@@ -17,19 +17,13 @@ table, tr, td, pre{
 table tr.active td{
   background-color:darkgray !important;
 }
-.display{
+
+
+.display {
   float: right;
   display: table;
   position: relative;
-  height: 28.125vw;
-  width: 45vw;
-  margin-right: 1vw;
   background: #000000;
-  font-size: 3.9156vw;
-  line-height: 3.636vw;
-  text-align: center;
-  font-family: Times;
-  font-weight: 100;
 }
 .middle {
   display: table-cell;
@@ -38,31 +32,89 @@ table tr.active td{
 
 .inner {
   margin: 0 auto;
-  padding: 10px;
-  width: 45vw; /*whatever width you want*/
+  padding: 1.61vw 0 0 0;
+  -ms-word-wrap: break-word;
   word-wrap: break-word;
-  color: #FFF;
+  white-space: pre-wrap;
+  text-align: center;
+  vertical-align: top;
+  font-size: 2.45vw;
+  color: #FFFFFF;
+  width: 34.72vw;
+  height: 19.53vw;
+  line-height: 2.11vw;
 }
-:host ::ng-deep pre{
-  line-height: 1.958vw;
+
+#display:-webkit-full-screen >.middle > .inner {
+  padding: 4.63vw 0 0 0;
+  font-size: 7.06vw;
+  width: 100vw;
+  height: 56.25vw;
+  line-height: 6.06vw;
 }
-:host ::ng-deep .inner sub{
-  font-size: 55%;
-  line-height: 1.958vw;
-  display: block;
-}
-:host ::ng-deep .inner p{
-  line-height: 3.356vw;
-  margin: 0;
-}
+
 :host ::ng-deep .newLine{
   display: block;
-  height: 3.9156vw;
+  height: 2.45vw;
 }
-.footer {
-  font-size: 1.958vw;
-  position: absolute;
-  bottom: 0;
-  left: 5px;
-  color: #FFF;
+:host ::ng-deep sup {
+  font-size: 1.02vw;
+  vertical-align: top;
+  position: relative;
+  top: 0.59vw;
+  display: inline-block;
+  margin-bottom: 2.17vw;
 }
+
+.inner pre{
+  color: #FFFFFF;
+}
+/*.display{*/
+  /*float: right;*/
+  /*display: table;*/
+  /*position: relative;*/
+  /*height: 28.125vw;*/
+  /*width: 45vw;*/
+  /*margin-right: 1vw;*/
+  /*background: #000000;*/
+  /*font-size: 3.9156vw;*/
+  /*line-height: 3.636vw;*/
+  /*text-align: center;*/
+  /*font-family: Times;*/
+  /*font-weight: 100;*/
+/*}*/
+/*.middle {*/
+  /*display: table-cell;*/
+  /*vertical-align: middle;*/
+/*}*/
+
+/*.inner {*/
+  /*margin: 0 auto;*/
+  /*padding: 10px;*/
+  /*width: 45vw; !*whatever width you want*!*/
+  /*word-wrap: break-word;*/
+  /*color: #FFF;*/
+/*}*/
+/*:host ::ng-deep pre{*/
+  /*line-height: 1.958vw;*/
+/*}*/
+/*:host ::ng-deep .inner sub{*/
+  /*font-size: 55%;*/
+  /*line-height: 1.958vw;*/
+  /*display: block;*/
+/*}*/
+/*:host ::ng-deep .inner p{*/
+  /*line-height: 3.356vw;*/
+  /*margin: 0;*/
+/*}*/
+/*:host ::ng-deep .newLine{*/
+  /*display: block;*/
+  /*height: 3.9156vw;*/
+/*}*/
+/*.footer {*/
+  /*font-size: 1.958vw;*/
+  /*position: absolute;*/
+  /*bottom: 0;*/
+  /*left: 5px;*/
+  /*color: #FFF;*/
+/*}*/

@@ -1,12 +1,13 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
-import {FormsModule} from "@angular/forms";
+import {FormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 import {AppComponent} from './app.component';
 import {HomeComponent} from './home/home.component';
 import {routing} from './route';
 import { SongComponent } from './song/song.component';
 import { DisplayComponent } from './display/display.component';
+import { FullscreenComponent } from './fullscreen/fullscreen.component';
 
 
 @NgModule({
@@ -14,7 +15,8 @@ import { DisplayComponent } from './display/display.component';
         AppComponent,
         HomeComponent,
         SongComponent,
-        DisplayComponent
+        DisplayComponent,
+        FullscreenComponent
     ],
     imports: [
         BrowserModule,

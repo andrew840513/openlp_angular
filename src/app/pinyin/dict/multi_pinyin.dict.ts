@@ -840,4 +840,4 @@ export var mutil_pinyin_dict = {
     "东西涌":"dōngxīchōng",
     "霞涌":"xiáchōng",
     "葵涌":"kuíchōng"
-}
+};

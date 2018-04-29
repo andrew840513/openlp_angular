@@ -1,7 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {AjaxService} from "../ajax.service";
-import * as x2js from "xml-js";
-import {ActivatedRoute} from "@angular/router";
+import {AjaxService} from '../ajax.service';
+import * as x2js from 'xml-js';
+import {ActivatedRoute} from '@angular/router';
+import {element} from 'protractor';
 
 @Component({
   selector: 'app-display',
@@ -9,52 +10,48 @@ import {ActivatedRoute} from "@angular/router";
   styleUrls: ['./display.component.css']
 })
 export class DisplayComponent implements OnInit {
-  static arr;
-  static position = 0;
-  _ajaxService:AjaxService;
+  arr;
+  position = 0;
+  _ajaxService: AjaxService;
   currentID = 1;
   xml;
   convert = x2js;
   title;
-  constructor(ajaxService:AjaxService, private route: ActivatedRoute) {
+
+  constructor(ajaxService: AjaxService, private route: ActivatedRoute) {
     this._ajaxService = ajaxService;
+    this.keyPress = this.keyPress.bind(this);
   }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.currentID = params['id'];
       this.getSong();
+      this.position = 0;
     });
-    document.addEventListener("keydown",this.keyPress)
-  }
-  getArr(){
-    return DisplayComponent.arr;
+    document.addEventListener('keydown', this.keyPress);
   }
 
-  getIndex(){
-    return DisplayComponent.position;
+  getIndex() {
+    return this.position;
   }
+
   getSong() {
-    let url = 'public/server.php/title,text/custom_slide/id/' + this.currentID;
+    const url = 'public/server.php/title,text/custom_slide/id/' + this.currentID;
     this._ajaxService.getData(url).subscribe(
       data => {
-        this.title=data['title'];
+        this.title = data['title'];
         let result = this.convert.xml2json(data['text'], {compact: true});
-        let songArray=[];
+        let songArray = [];
         result = JSON.parse(result);
-        if(result["song"]["lyrics"]["verse"] instanceof Array){
-          for (let verse of result["song"]["lyrics"]["verse"]) {
-            if(verse._cdata == undefined){
-              verse._cdata = '';
-            }
-            songArray = songArray.concat(this.seprateNewLine(verse._cdata));
+        for (const verse of result['song']['lyrics']['verse']) {
+          if (verse._cdata === undefined) {
+            verse._cdata = '';
           }
-          this.xml = result["song"]["lyrics"]["verse"];
-        }else{
-          songArray = songArray.concat(this.seprateNewLine(result["song"]["lyrics"]["verse"]._cdata,true));
-          this.xml = [{'_cdata':result["song"]["lyrics"]["verse"]._cdata}];
+          songArray = songArray.concat(this.seprateNewLine(verse._cdata));
         }
-        DisplayComponent.arr = songArray;
+        this.xml = result['song']['lyrics']['verse'];
+        this.arr = songArray;
       },
       error => {
         console.log(error);
@@ -65,78 +62,91 @@ export class DisplayComponent implements OnInit {
   }
 
   keyPress(event) {
-    let keyCode = event.which || event.keyCode;
-    if(keyCode == 38 && DisplayComponent.position > 0){
-      DisplayComponent.position--;
-    }else if(keyCode == 40 &&DisplayComponent.position < DisplayComponent.arr.length-1) {
-      DisplayComponent.position++;
+    const keyCode = event.which || event.keyCode;
+    if (keyCode === 38 && this.position > 0) {
+      this.position--;
+    } else if (keyCode === 40 && this.position < this.arr.length - 1) {
+      this.position++;
     }
-    if(keyCode == 27){
-      let contextMenu = document.getElementById('contextMenu');
-      let songActionMenu = document.getElementById('songActionMenu');
-      if(contextMenu){
+    if (keyCode === 27) {
+      const contextMenu = document.getElementById('contextMenu');
+      const songActionMenu = document.getElementById('songActionMenu');
+      if (contextMenu) {
         contextMenu.style.display = 'none';
       }
-      if(songActionMenu){
+      if (songActionMenu) {
         songActionMenu.style.display = 'none';
       }
     }
+    return false;
   }
 
-  replaceWithTag(text,tag,htmlTag){
-    let startTag = new RegExp('{'+tag+'}',"g");
-    let endTag = new RegExp('{/'+tag+'}',"g");
-    if(text != '') {
-      let newText = text.replace(startTag, '<' + htmlTag + '>')
+  replaceWithTag(text, tag, htmlTag) {
+    const startTag = new RegExp('{' + tag + '}', 'g');
+    const endTag = new RegExp('{/' + tag + '}', 'g');
+    if (text !== '') {
+      text = text.replace(startTag, '<' + htmlTag + '>')
         .replace(endTag, '</' + htmlTag + '>');
-      return newText;
-    }else{
-      return '';
-    }
-  }
-  removeTag(text){
-    if(text) {
-      let regex = new RegExp('{su}|{st}|{/su}|{/st}', "g");
-      let newText = text.replace(regex, '');
-      return newText;
-    }else{
+      return text;
+    } else {
       return '';
     }
   }
 
-  seprateNewLine(text, onlyOneLine = false){
-    let pTag = '<p>';
-    text = this.replaceWithTag(text,'su','sub');
-    text = this.replaceWithTag(text,'st','strong');
-    let subString = text.match(/<sub>[\s\S]*?<\/sub>/g);
-    text = text.replace(/<sub>[\s\S]*?<\/sub>/g,'~');
-    if(subString){
-      for(let i = 0; i < subString.length ; i++){
-        text = text.replace('~',subString[i].replace('\n','<br>'));
-      }
+  removeTag(text) {
+    if (text) {
+      const regex = new RegExp('{su}|{st}|{/su}|{/st}', 'g');
+      const newText = text.replace(regex, '');
+      return newText;
+    } else {
+      return '';
     }
-
-
-    let newText = pTag.concat(text.replace(/\n/g,'</p><p>'));
-    newText = newText.replace('<p></p>','<span class="newLine"></span>');
-    if(onlyOneLine){
-      newText = newText.concat('</p>');
-    }
-    return newText;
   }
 
-  setSelectedRow(index){
-    DisplayComponent.position = index;
+  seprateNewLine(text) {
+    const split = text.split('\n');
+    let rebuild;
+    for (let i = 0; i < split.length; i++) {
+      split[i] = split[i].trim();
+    }
+    rebuild = split.join().replace(/,/g, '\n');
+    text = rebuild.replace(/\n/g, '<br>');
+    text = this.replaceWithTag(text, 'su', 'sup');
+    text = this.replaceWithTag(text, 'st', 'strong');
+    return text;
+  }
+
+  setSelectedRow(index) {
+    this.position = index;
   }
 
   hideContextMenu() {
-    let contextMenu = document.getElementById('contextMenu');
-    let songActionMenu = document.getElementById('songActionMenu');
-    if(contextMenu){
+    const contextMenu = document.getElementById('contextMenu');
+    const songActionMenu = document.getElementById('songActionMenu');
+    if (contextMenu) {
       contextMenu.style.display = 'none';
     }
-    if(songActionMenu){
+    if (songActionMenu) {
       songActionMenu.style.display = 'none';
     }
   }
+
+  full_screen() {
+    if ('fullscreenEnabled' in document || 'webkitFullscreenEnabled' in document) {
+      if (document.fullscreenEnabled || document.webkitFullscreenEnabled) {
+        console.log('User allows fullscreen');
+
+        const display = document.getElementById('display');
+        // requestFullscreen is used to display an element in full screen mode.
+        if ('requestFullscreen' in display) {
+          display.requestFullscreen();
+        } else if ('webkitRequestFullscreen' in display) {
+          display.webkitRequestFullscreen();
+        }
+      }
+    } else {
+      console.log('User doesn\'t allow full screen');
+    }
+  }
+
 }

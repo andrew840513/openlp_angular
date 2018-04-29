@@ -1,0 +1,49 @@
+.display {
+  float: right;
+  display: table;
+  position: relative;
+  background: #000000;
+}
+.middle {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.inner {
+  margin: 0 auto;
+  padding: 1.61vw 0 0 0;
+  -ms-word-wrap: break-word;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  text-align: center;
+  vertical-align: top;
+  font-size: 2.45vw;
+  color: #FFFFFF;
+  width: 34.72vw;
+  height: 19.53vw;
+  line-height: 2.11vw;
+}
+
+:host ::ng-deep sup {
+  font-size: 1.02vw;
+  vertical-align: top;
+  position: relative;
+  top: 0.59vw;
+  display: inline-block;
+  margin-bottom: 2.17vw;
+}
+
+.inner pre{
+  color: #FFFFFF;
+}
+
+.display:-webkit-full-screen >.middle>.inner
+{
+  background: grey;
+  padding: 4.63vw 0 0 0;
+  font-size: 7.06vw;
+  width: 100vw;
+  height: 56.25vw;
+  line-height: 6.06vw;
+}
+
