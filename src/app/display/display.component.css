@@ -6,7 +6,6 @@ table, tr, td, pre{
 #table{
   height: 52.934vw;
   border: 1px solid black;
-  float: left;
   table-layout: fixed;
   overflow: auto;
 }
@@ -20,10 +19,10 @@ table tr.active td{
 
 
 .display {
-  float: right;
   display: table;
   position: relative;
   background: #000000;
+  zoom: 0.5;
 }
 .middle {
   display: table-cell;
@@ -31,18 +30,19 @@ table tr.active td{
 }
 
 .inner {
+  font-family: "Times New Roman";
   margin: 0 auto;
-  padding: 1.61vw 0 0 0;
+  padding: 46px 0 0 0;
   -ms-word-wrap: break-word;
   word-wrap: break-word;
   white-space: pre-wrap;
   text-align: center;
   vertical-align: top;
-  font-size: 2.45vw;
+  font-size: 114px;
   color: #FFFFFF;
-  width: 34.72vw;
-  height: 19.53vw;
-  line-height: 2.11vw;
+  width: 1600px;
+  height: 900px;
+  line-height: 97px;
 }
 
 #display:-webkit-full-screen >.middle > .inner {
@@ -52,69 +52,21 @@ table tr.active td{
   height: 56.25vw;
   line-height: 6.06vw;
 }
-
-:host ::ng-deep .newLine{
-  display: block;
-  height: 2.45vw;
+:host ::ng-deep #display:-webkit-full-screen >.middle > .inner sup{
+  font-size: 2.94vw;
+  top: 1.69vw;
+  margin-bottom: 6.25vw;
 }
+
 :host ::ng-deep sup {
-  font-size: 1.02vw;
+  font-size: 66px;
   vertical-align: top;
   position: relative;
-  top: 0.59vw;
+  top: 42px;
   display: inline-block;
-  margin-bottom: 2.17vw;
+  margin-bottom: 110px;
 }
 
 .inner pre{
   color: #FFFFFF;
 }
-/*.display{*/
-  /*float: right;*/
-  /*display: table;*/
-  /*position: relative;*/
-  /*height: 28.125vw;*/
-  /*width: 45vw;*/
-  /*margin-right: 1vw;*/
-  /*background: #000000;*/
-  /*font-size: 3.9156vw;*/
-  /*line-height: 3.636vw;*/
-  /*text-align: center;*/
-  /*font-family: Times;*/
-  /*font-weight: 100;*/
-/*}*/
-/*.middle {*/
-  /*display: table-cell;*/
-  /*vertical-align: middle;*/
-/*}*/
-
-/*.inner {*/
-  /*margin: 0 auto;*/
-  /*padding: 10px;*/
-  /*width: 45vw; !*whatever width you want*!*/
-  /*word-wrap: break-word;*/
-  /*color: #FFF;*/
-/*}*/
-/*:host ::ng-deep pre{*/
-  /*line-height: 1.958vw;*/
-/*}*/
-/*:host ::ng-deep .inner sub{*/
-  /*font-size: 55%;*/
-  /*line-height: 1.958vw;*/
-  /*display: block;*/
-/*}*/
-/*:host ::ng-deep .inner p{*/
-  /*line-height: 3.356vw;*/
-  /*margin: 0;*/
-/*}*/
-/*:host ::ng-deep .newLine{*/
-  /*display: block;*/
-  /*height: 3.9156vw;*/
-/*}*/
-/*.footer {*/
-  /*font-size: 1.958vw;*/
-  /*position: absolute;*/
-  /*bottom: 0;*/
-  /*left: 5px;*/
-  /*color: #FFF;*/
-/*}*/

@@ -1,4 +1,4 @@
-<div class="container" (click)="hideContextMenu()" (keydown)="keyPress($event)">
+<div (click)="hideContextMenu()" (keydown)="keyPress($event)">
   <div id="table">
     <table *ngIf="xml" class="table table-striped">
       <tr><th colspan="2">{{title}}</th></tr>
